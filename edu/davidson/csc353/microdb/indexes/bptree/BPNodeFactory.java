@@ -153,7 +153,7 @@ public class BPNodeFactory<K extends Comparable<K>, V> {
 		NodeTimestamp oldest = nodePQ.removeMin();
 		nodeMap.remove(oldest.node.number);
 
-		relation.writeNode(oldest.node);
+		this.writeNode(oldest.node);
 	}
 
 	/**
