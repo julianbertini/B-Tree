@@ -1,0 +1,10 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - BPTree",
+            "request": "launch",
+            "mainClass": "edu.davidson.csc353.microdb.indexes.bptree.BPTree"
+        }
+    ]
+}
