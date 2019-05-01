@@ -12,7 +12,6 @@ import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.function.Function;
 
@@ -71,6 +70,7 @@ public class BPNodeFactory<K extends Comparable<K>, V> {
 			numberNodes = 0;
 
 			nodeMap = new TreeMap<Integer, NodeTimestamp>();
+			nodePQ = new DecentPQ<>();
 		}
 		catch (FileNotFoundException exception) {
 			// Ignore: a new file has been created
@@ -123,11 +123,16 @@ public class BPNodeFactory<K extends Comparable<K>, V> {
 	private BPNode<K,V> readNode(int nodeNumber) {
 
 		ByteBuffer buffer = ByteBuffer.allocate(DISK_SIZE);
+		buffer.rewind();
 		// doesn't matter whether leaf if true/false. Will get overriden. 
 		BPNode<K,V> node = new BPNode<K,V>(false);
 		
-		relationChannel.read(buffer, nodeNumber * DISK_SIZE);
-		buffer.rewind();
+		try {
+			relationChannel.read(buffer, nodeNumber * DISK_SIZE);
+		} catch (IOException io) {
+			throw new RuntimeException("Error reading from node file");
+		}
+
 		node.load(buffer, loadKey, loadValue);
 
 		return node;
@@ -143,7 +148,11 @@ public class BPNodeFactory<K extends Comparable<K>, V> {
 
 		node.save(buffer);
 		buffer.rewind();
-		relationChannel.write(buffer, node.number * DISK_SIZE);
+		try {
+			relationChannel.write(buffer, node.number * DISK_SIZE);
+		} catch (IOException io) {
+			throw new RuntimeException("Error writing to node file");
+		}
 	}
 
 	/**

@@ -121,20 +121,16 @@ public class BPTree<K extends Comparable<K>, V> {
 		if(node.isLeaf()) {
 			return node;
 		}
-		
+
 		int i;
+
 		for(i = 0; i < node.keys.size(); i++) {
-			//System.out.println("in for");
-			if(node.getKey(i) == key){
-				return(find(nodeFactory.getNode(node.getChild(i+1)), key));
-			}
-			else if (more(node.getKey(i), key)){
-				return(find(nodeFactory.getNode(node.getChild(i)), key));
+			if(more(node.getKey(i), key)) {
+				break;
 			}
 		}
-		//second loop for last non-null key. 
-		// find the last child of node 
-		return(find(nodeFactory.getNode(node.getChild(node.children.size() - 1)), key)); //is this actually the last non-null node.
+
+		return find(nodeFactory.getNode(node.getChild(i)), key);
 	}
 
 	/**

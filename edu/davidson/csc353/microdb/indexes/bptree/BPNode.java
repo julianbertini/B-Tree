@@ -210,7 +210,6 @@ public class BPNode<K extends Comparable<K>, V> {
 
 		result.left = this;
 		result.right = nodeFactory.create(false);
-		result.right.children.add(0, null);
 
 		// so since it's internal, then values are pointers to deeper nodes
 
@@ -219,11 +218,17 @@ public class BPNode<K extends Comparable<K>, V> {
 		// pointers at i=4 and i=5 (5th one is overflow, but included in right)
 		// copy second half of left into right
 		int roundUpMid = BPNode.SIZE - BPNode.SIZE/2;
+
+		// add pointer at i=3 to right. every node must have one more pointer than num. of keys
+		result.right.children.add(result.left.children.get(roundUpMid));
+
 		for (int i = 0; i < roundUpMid - 1; i++) {
 			K removedKey = result.left.keys.remove(BPNode.SIZE - (i + 1));
 			Integer removedChild = result.left.children.remove(BPNode.SIZE - i);
 			result.right.insertChild(removedKey, removedChild, nodeFactory);			
 		}
+
+		result.left.children.remove(roundUpMid);
 		
 		// middle key between pointers left and pointers right will be key at i=2
 		int midKeyIndex = BPNode.SIZE/2;
@@ -301,7 +306,6 @@ public class BPNode<K extends Comparable<K>, V> {
 
 			byte[] data = new byte[size];
 			buffer.get(data);
-
 			this.values.add(loadValue.apply(new String(data)));
 		}
 		numElements = buffer.getInt();
